@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -28,7 +27,7 @@
     <option>Dienstag</option><option>Mittwoch</option><option>Donnerstag</option><option>Freitag</option>
   </select>
   <br>
-  <button onclick="exportToExcel()">💾 Alles als Excel speichern</button>
+  <button onclick="sicherExportieren()">💾 Alles als Excel speichern</button>
   <button onclick="resetAll()">🔄 Zurücksetzen</button>
   <button onclick="addExtraPerson()">➕ Weitere Person hinzufügen</button>
 </div>
@@ -49,6 +48,8 @@ function speichereDaten() {
 function ladeGespeicherteDaten() {
   const gespeicherteDaten = localStorage.getItem("strichliste_daten");
   const gespeicherterTag = localStorage.getItem("strichliste_tag");
+  const letzterExportTag = localStorage.getItem("letzterGespeicherterTag");
+
   if (gespeicherteDaten) {
     try {
       tage = JSON.parse(gespeicherteDaten);
@@ -56,7 +57,10 @@ function ladeGespeicherteDaten() {
       tage = {};
     }
   }
-  if (gespeicherterTag) {
+
+  if (letzterExportTag) {
+    aktuellerTag = letzterExportTag;
+  } else if (gespeicherterTag) {
     aktuellerTag = gespeicherterTag;
   }
 }
@@ -120,6 +124,16 @@ function baueListe(data) {
     });
     table.appendChild(tr);
   });
+}
+
+function sicherExportieren() {
+  let pw = prompt("Bitte Passwort zum Speichern eingeben:");
+  if (pw === "lager2025") {
+    localStorage.setItem("letzterGespeicherterTag", aktuellerTag);
+    exportToExcel();
+  } else if (pw) {
+    alert("Falsches Passwort.");
+  }
 }
 
 function exportToExcel(filename = "strichliste-alle-tage.xlsx") {

@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <title>Zeltlager Strichliste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="manifest" href="manifest.json">
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
     h1 { text-align: center; }
@@ -17,11 +16,11 @@
     .btn-minus { background-color: #dc3545; color: white; border: none; padding: 5px 10px; font-size: 16px; }
     .name-col { text-align: left; padding-left: 10px; }
     #statistik { display: none; }
-    canvas { max-width: 100%; height: auto; }
+    canvas { max-width: 100%; }
   </style>
 </head>
 <body>
-<h1 id="ueberschrift">Zeltlager Strichliste</h1>
+<h1 id="ueberschrift">Zeltlager Strichliste – Samstag</h1>
 
 <div id="liste-seite" style="text-align: center;">
   <label for="tagSelector">Wähle einen Tag:</label>
@@ -30,72 +29,38 @@
     <option>Dienstag</option><option>Mittwoch</option><option>Donnerstag</option><option>Freitag</option>
   </select>
   <br>
-  <button onclick="sicherExportieren()">💾 Alles als Excel speichern</button>
-  <button onclick="resetAll()">🔄 Zurücksetzen</button>
-  <button onclick="addExtraPerson()">➕ Weitere Person hinzufügen</button>
   <button onclick="zeigeStatistik()">📊 Statistik anzeigen</button>
 </div>
 
 <table id="liste"></table>
 
 <div id="statistik" style="display:none; text-align:center;">
-  <h2>Getränkestatistik der Woche</h2>
+  <h2>Wochengesamt-Statistik</h2>
   <canvas id="chart"></canvas>
-  <br>
-  <button onclick="zurueckZurListe()">⬅️ Zurück zur Liste</button>
+  <br><button onclick="zurueckZurListe()">⬅️ Zurück</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-let initialNames = ["Katha Groß", "Christina", "David Stahl", "Julian", "Louis", "Katha Mittel", "Basti", "Alex Müp", "Müp", "Rainer", "Resi", "Julius Meier", "Linda", "Amelie", "Milena", "Alex Kook", "Emil", "Paula", "Gabriel", "Phillip Heuß", "Jonathan", "Alia", "Julius König", "Sophia Stahl", "Susen", "Tara", "Tina", "Vincent", "Johanna", "Marco", "Annika", "David Braun", "Elena", "Fabian", "Franzi", "Hannnah", "Hannes", "Jessica", "Jonas Müller", "Jule", "Kai", "Katharina klein", "Laurenz", "Lea", "M...
+let initialNames = ["Anna", "Ben", "Clara"];
 let tage = {};
 let aktuellerTag = "Samstag";
+let tageNamen = ["Samstag","Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag"];
 
-function speichereDaten() {
-  localStorage.setItem("strichliste_daten", JSON.stringify(tage));
-  localStorage.setItem("strichliste_tag", aktuellerTag);
-  localStorage.setItem("letzterGespeicherterTag", aktuellerTag);
+function initDaten() {
+  tageNamen.forEach(tag => {
+    if (!tage[tag]) {
+      tage[tag] = {};
+      initialNames.forEach(n => tage[tag][n] = {soft: 0, wasser: 0, bier: 0, last: {}});
+    }
+  });
 }
 
-function ladeGespeicherteDaten() {
-  const gespeicherteDaten = localStorage.getItem("strichliste_daten");
-  const letzterExportTag = localStorage.getItem("letzterGespeicherterTag");
-  if (gespeicherteDaten) {
-    try { tage = JSON.parse(gespeicherteDaten); } catch(e) { tage = {}; }
-  }
-  if (letzterExportTag) aktuellerTag = letzterExportTag;
-}
-
-
-document.getElementById("tagSelector").value = aktuellerTag;
-document.getElementById("ueberschrift").textContent = "Zeltlager Strichliste – " + aktuellerTag;
-document.getElementById("tagSelector").onchange = (e) => {
-
-  aktuellerTag = e.target.value;
-  ladeTag(aktuellerTag);
-};
-
-function ladeTag(tag) {
-  aktuellerTag = tag;
-  document.getElementById("ueberschrift").textContent = "Zeltlager Strichliste – " + tag;
-  if (!tage[tag]) {
-    tage[tag] = {};
-    initialNames.forEach(n => {
-      tage[tag][n] = {soft: 0, wasser: 0, bier: 0, last: {}};
-    });
-  } else {
-    Object.keys(tage[tag]).forEach(n => {
-      if (!tage[tag][n].last) tage[tag][n].last = {};
-    });
-  }
-  baueListe(tage[tag]);
-  speichereDaten();
-}
-
-function baueListe(data) {
+function zeige() {
+  document.getElementById("ueberschrift").textContent = "Zeltlager Strichliste – " + aktuellerTag;
   let table = document.getElementById("liste");
   table.innerHTML = "<tr><th>Name</th><th>Soft</th><th>Wasser</th><th>Bier</th></tr>";
+  let data = tage[aktuellerTag];
   Object.keys(data).forEach(name => {
     let tr = document.createElement("tr");
     let tdName = document.createElement("td");
@@ -110,7 +75,6 @@ function baueListe(data) {
       plus.onclick = () => {
         data[name][cat]++;
         data[name].last[cat] = "plus";
-        speichereDaten();
         zeige();
       };
       let minus = document.createElement("button");
@@ -120,7 +84,6 @@ function baueListe(data) {
         if (data[name].last[cat] === "plus" && data[name][cat] > 0) {
           data[name][cat]--;
           data[name].last[cat] = null;
-          speichereDaten();
           zeige();
         }
       };
@@ -133,30 +96,10 @@ function baueListe(data) {
   });
 }
 
-function sicherExportieren() {
-  let pw = prompt("Bitte Passwort zum Speichern eingeben:");
-  if (pw === "lager2025") {
-    speichereDaten();
-    exportToExcel();
-  } else if (pw) {
-    alert("Falsches Passwort.");
-  }
-}
-
-function exportToExcel(filename = "strichliste-alle-tage.xlsx") {
-  const ws_data = [["Tag", "Name", "Softgetränke", "Wasser", "Bier"]];
-  ["Samstag","Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag"].forEach(tag => {
-    if (!tage[tag]) return;
-    for (const name in tage[tag]) {
-      let d = tage[tag][name];
-      ws_data.push([tag, name, d.soft, d.wasser, d.bier]);
-    }
-  });
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(ws_data);
-  XLSX.utils.book_append_sheet(wb, ws, "Daten");
-  XLSX.writeFile(wb, filename);
-}
+document.getElementById("tagSelector").onchange = (e) => {
+  aktuellerTag = e.target.value;
+  zeige();
+};
 
 function zeigeStatistik() {
   document.getElementById("liste-seite").style.display = "none";
@@ -172,23 +115,17 @@ function zurueckZurListe() {
 }
 
 function zeichneChart() {
-  let tageNamen = ["Samstag","Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag"];
   let soft = [], wasser = [], bier = [];
   tageNamen.forEach(tag => {
-    let sumSoft = 0, sumWasser = 0, sumBier = 0;
-    if (tage[tag]) {
-      for (const name in tage[tag]) {
-        sumSoft += tage[tag][name].soft;
-        sumWasser += tage[tag][name].wasser;
-        sumBier += tage[tag][name].bier;
-      }
+    let s=0, w=0, b=0;
+    for (const name in tage[tag]) {
+      s += tage[tag][name].soft;
+      w += tage[tag][name].wasser;
+      b += tage[tag][name].bier;
     }
-    soft.push(sumSoft);
-    wasser.push(sumWasser);
-    bier.push(sumBier);
+    soft.push(s); wasser.push(w); bier.push(b);
   });
-
-  const ctx = document.getElementById('chart').getContext('2d');
+  const ctx = document.getElementById("chart").getContext("2d");
   if (window.barChart) window.barChart.destroy();
   window.barChart = new Chart(ctx, {
     type: 'bar',
@@ -200,45 +137,14 @@ function zeichneChart() {
         { label: 'Bier', data: bier }
       ]
     },
-    options: {
-      responsive: true,
-      plugins: { legend: { position: 'top' }, title: { display: false } }
-    }
+    options: { responsive: true }
   });
 }
 
-function resetAll() {
-  let pass = prompt("Bitte Passwort zum Zurücksetzen eingeben:");
-  if (pass === "lager2025") {
-    tage = {};
-    ladeTag(aktuellerTag);
-    speichereDaten();
-  }
-}
-
-function addExtraPerson() {
-  const name = prompt("Name der neuen Person:");
-  if (!name || !aktuellerTag) return;
-  if (!tage[aktuellerTag][name]) {
-    tage[aktuellerTag][name] = { soft: 0, wasser: 0, bier: 0, last: {} };
-    baueListe(tage[aktuellerTag]);
-    speichereDaten();
-  }
-}
-
-function zeige() {
-  baueListe(tage[aktuellerTag]);
-}
-
-
-ladeGespeicherteDaten();
-if (!tage[aktuellerTag]) {
-  tage[aktuellerTag] = {};
-  initialNames.forEach(n => tage[aktuellerTag][n] = {soft: 0, wasser: 0, bier: 0, last: {}});
-}
-ladeTag(aktuellerTag);
-
+initDaten();
+zeige();
 </script>
 </body>
 </html>
+
 

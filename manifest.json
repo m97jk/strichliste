@@ -1,7 +1,7 @@
 {
   "name": "Strichliste Zeltlager",
   "short_name": "Strichliste",
-  "start_url": "strichliste.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007bff",

@@ -31,73 +31,11 @@
   <button onclick="sicherExportieren()">💾 Alles als Excel speichern</button>
   <button onclick="resetAll()">🔄 Zurücksetzen</button>
   <button onclick="addExtraPerson()">➕ Weitere Person hinzufügen</button>
-
-  <button onclick="zeigeStatistik()">📊 Statistik anzeigen</button>
 </div>
 
 <table id="liste"></table>
 
-<div id="statistikSeite" style="display:none; text-align:center;">
-  <h2>Wochengesamt-Statistik</h2>
-  <canvas id="chart" style="max-width:90%;"></canvas>
-  <br><br>
-  <button onclick="zurueckZurListe()">⬅️ Zurück zur Liste</button>
-</div>
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-function zeigeStatistik() {
-  document.getElementById("liste").style.display = "none";
-  document.getElementById("statistikSeite").style.display = "block";
-  zeichneChart();
-}
-
-function zurueckZurListe() {
-  document.getElementById("liste").style.display = "table";
-  document.getElementById("statistikSeite").style.display = "none";
-}
-
-function zeichneChart() {
-  let soft = [], wasser = [], bier = [];
-  let tageNamen = ["Samstag","Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag"];
-  tageNamen.forEach(tag => {
-    let s=0, w=0, b=0;
-    if (tage[tag]) {
-      for (const name in tage[tag]) {
-        s += tage[tag][name].soft;
-        w += tage[tag][name].wasser;
-        b += tage[tag][name].bier;
-      }
-    }
-    soft.push(s); wasser.push(w); bier.push(b);
-  });
-
-  const ctx = document.getElementById("chart").getContext("2d");
-  if (window.barChart) window.barChart.destroy();
-  window.barChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: tageNamen,
-      datasets: [
-        { label: 'Softgetränke', data: soft },
-        { label: 'Wasser', data: wasser },
-        { label: 'Bier', data: bier }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'top' },
-        title: { display: true, text: 'Getränke pro Tag (gesamt)' }
-      }
-    }
-  });
-}
-</script>
-</script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 let initialNames = ["Katha Groß", "Christina", "David Stahl", "Julian", "Louis", "Katha Mittel", "Basti", "Alex Müp", "Müp", "Rainer", "Resi", "Julius Meier", "Linda", "Amelie", "Milena", "Alex Kook", "Emil", "Paula", "Gabriel", "Phillip Heuß", "Jonathan", "Alia", "Julius König", "Sophia Stahl", "Susen", "Tara", "Tina", "Vincent", "Johanna", "Marco", "Annika", "David Braun", "Elena", "Fabian", "Franzi", "Hannnah", "Hannes", "Jessica", "Jonas Müller", "Jule", "Kai", "Katharina klein", "Laurenz", "Lea", "Marlon", "Mika", "Niko", "Jonas Schug", "Simon", "Sophia Reuß", "Tom"];
 let tage = {};
@@ -239,59 +177,7 @@ function zeige() {
 
 ladeGespeicherteDaten();
 ladeTag(aktuellerTag);
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-function zeigeStatistik() {
-  document.getElementById("liste").style.display = "none";
-  document.getElementById("statistikSeite").style.display = "block";
-  zeichneChart();
-}
-
-function zurueckZurListe() {
-  document.getElementById("liste").style.display = "table";
-  document.getElementById("statistikSeite").style.display = "none";
-}
-
-function zeichneChart() {
-  let soft = [], wasser = [], bier = [];
-  let tageNamen = ["Samstag","Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag"];
-  tageNamen.forEach(tag => {
-    let s=0, w=0, b=0;
-    if (tage[tag]) {
-      for (const name in tage[tag]) {
-        s += tage[tag][name].soft;
-        w += tage[tag][name].wasser;
-        b += tage[tag][name].bier;
-      }
-    }
-    soft.push(s); wasser.push(w); bier.push(b);
-  });
-
-  const ctx = document.getElementById("chart").getContext("2d");
-  if (window.barChart) window.barChart.destroy();
-  window.barChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: tageNamen,
-      datasets: [
-        { label: 'Softgetränke', data: soft },
-        { label: 'Wasser', data: wasser },
-        { label: 'Bier', data: bier }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'top' },
-        title: { display: true, text: 'Getränke pro Tag (gesamt)' }
-      }
-    }
-  });
-}
 </script>
-</script>
-
 </body>
 </html>
 

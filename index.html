@@ -67,7 +67,11 @@ function ladeGespeicherteDaten() {
   if (letzterExportTag) aktuellerTag = letzterExportTag;
 }
 
+
+document.getElementById("tagSelector").value = aktuellerTag;
+document.getElementById("ueberschrift").textContent = "Zeltlager Strichliste – " + aktuellerTag;
 document.getElementById("tagSelector").onchange = (e) => {
+
   aktuellerTag = e.target.value;
   ladeTag(aktuellerTag);
 };
@@ -226,10 +230,15 @@ function zeige() {
   baueListe(tage[aktuellerTag]);
 }
 
+
 ladeGespeicherteDaten();
-if (!tage[aktuellerTag]) { ladeTag(aktuellerTag); } else { baueListe(tage[aktuellerTag]); document.getElementById('ueberschrift').textContent = 'Zeltlager Strichliste – ' + aktuellerTag; }
+if (!tage[aktuellerTag]) {
+  tage[aktuellerTag] = {};
+  initialNames.forEach(n => tage[aktuellerTag][n] = {soft: 0, wasser: 0, bier: 0, last: {}});
+}
+ladeTag(aktuellerTag);
+
 </script>
 </body>
 </html>
-
 

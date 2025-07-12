@@ -71,7 +71,11 @@ function ladeTag(tag) {
   if (!tage[tag]) {
     tage[tag] = {};
     initialNames.forEach(n => {
-      tage[tag][n] = {soft: 0, wasser: 0, bier: 0};
+      tage[tag][n] = {soft: 0, wasser: 0, bier: 0, last: {}};
+    });
+  } else {
+    Object.keys(tage[tag]).forEach(n => {
+      if (!tage[tag][n].last) tage[tag][n].last = {};
     });
   }
   baueListe(tage[tag]);
@@ -94,6 +98,7 @@ function baueListe(data) {
       plus.className = "btn-plus";
       plus.onclick = () => {
         data[name][cat]++;
+        data[name].last[cat] = "plus";
         speichereDaten();
         zeige();
       };
@@ -101,8 +106,9 @@ function baueListe(data) {
       minus.textContent = "−";
       minus.className = "btn-minus";
       minus.onclick = () => {
-        if (data[name][cat] > 0) {
+        if (data[name].last[cat] === "plus" && data[name][cat] > 0) {
           data[name][cat]--;
+          data[name].last[cat] = null;
           speichereDaten();
           zeige();
         }
@@ -144,7 +150,7 @@ function addExtraPerson() {
   const name = prompt("Name der neuen Person:");
   if (!name || !aktuellerTag) return;
   if (!tage[aktuellerTag][name]) {
-    tage[aktuellerTag][name] = { soft: 0, wasser: 0, bier: 0 };
+    tage[aktuellerTag][name] = { soft: 0, wasser: 0, bier: 0, last: {} };
     baueListe(tage[aktuellerTag]);
     speichereDaten();
   }
@@ -159,4 +165,5 @@ ladeTag(aktuellerTag);
 </script>
 </body>
 </html>
+
 

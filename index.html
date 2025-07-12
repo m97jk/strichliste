@@ -227,10 +227,9 @@ function zeige() {
 }
 
 ladeGespeicherteDaten();
-ladeTag(aktuellerTag);
+if (!tage[aktuellerTag]) { ladeTag(aktuellerTag); } else { baueListe(tage[aktuellerTag]); document.getElementById('ueberschrift').textContent = 'Zeltlager Strichliste – ' + aktuellerTag; }
 </script>
 </body>
 </html>
-
 
 

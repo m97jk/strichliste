@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -39,7 +38,13 @@
 <script>
 let initialNames = ["Katha Groß", "Christina", "David Stahl", "Julian", "Louis", "Katha Mittel", "Basti", "Alex Müp", "Müp", "Rainer", "Resi", "Julius Meier", "Linda", "Amelie", "Milena", "Alex Kook", "Emil", "Paula", "Gabriel", "Phillip Heuß", "Jonathan", "Alia", "Julius König", "Sophia Stahl", "Susen", "Tara", "Tina", "Vincent", "Johanna", "Marco", "Annika", "David Braun", "Elena", "Fabian", "Franzi", "Hannnah", "Hannes", "Jessica", "Jonas Müller", "Jule", "Kai", "Katharina klein", "Laurenz", "Lea", "Marlon", "Mika", "Niko", "Jonas Schug", "Simon", "Sophia Reuß", "Tom"];
 let tage = {};
-let aktuellerTag = "Samstag";
+
+let gespeicherterTag = localStorage.getItem("strichliste_tag");
+let aktuellerTag = gespeicherterTag ? gespeicherterTag : "Samstag";
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("tagSelector").value = aktuellerTag;
+});
+
 
 function speichereDaten() {
   localStorage.setItem("strichliste_daten", JSON.stringify(tage));

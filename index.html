@@ -18,7 +18,10 @@
   </style>
 </head>
 <body>
+
 <h1>Zeltlager Strichliste</h1>
+<canvas id="kopfgrafik" style="max-width:100%; max-height:200px; margin-bottom:20px;"></canvas>
+
 
 <div style="text-align: center;">
   <label for="tagSelector">Wähle einen Tag:</label>
@@ -74,6 +77,7 @@ function ladeGespeicherteDaten() {
 document.getElementById("tagSelector").onchange = (e) => {
   aktuellerTag = e.target.value;
   ladeTag(aktuellerTag);
+aktualisiereKopfgrafik();
 };
 
 function ladeTag(tag) {
@@ -90,6 +94,7 @@ function ladeTag(tag) {
   }
   baueListe(tage[tag]);
   speichereDaten();
+aktualisiereKopfgrafik();
 }
 
 function baueListe(data) {
@@ -110,6 +115,7 @@ function baueListe(data) {
         data[name][cat]++;
         data[name].last[cat] = "plus";
         speichereDaten();
+aktualisiereKopfgrafik();
         zeige();
       };
       let minus = document.createElement("button");
@@ -120,6 +126,7 @@ function baueListe(data) {
           data[name][cat]--;
           data[name].last[cat] = null;
           speichereDaten();
+aktualisiereKopfgrafik();
           zeige();
         }
       };
@@ -162,7 +169,9 @@ function resetAll() {
   if (pass === "lager2025") {
     tage = {};
     ladeTag(aktuellerTag);
+aktualisiereKopfgrafik();
     speichereDaten();
+aktualisiereKopfgrafik();
   }
 }
 
@@ -173,6 +182,7 @@ function addExtraPerson() {
     tage[aktuellerTag][name] = { soft: 0, wasser: 0, bier: 0, last: {} };
     baueListe(tage[aktuellerTag]);
     speichereDaten();
+aktualisiereKopfgrafik();
   }
 }
 
@@ -182,7 +192,54 @@ function zeige() {
 
 ladeGespeicherteDaten();
 ladeTag(aktuellerTag);
+aktualisiereKopfgrafik();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let grafikChart;
+
+function aktualisiereKopfgrafik() {
+  let soft = [], wasser = [], bier = [];
+  let tageNamen = ["Samstag","Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag"];
+  tageNamen.forEach(tag => {
+    let s=0, w=0, b=0;
+    if (tage[tag]) {
+      for (const name in tage[tag]) {
+        s += tage[tag][name].soft;
+        w += tage[tag][name].wasser;
+        b += tage[tag][name].bier;
+      }
+    }
+    soft.push(s); wasser.push(w); bier.push(b);
+  });
+
+  const ctx = document.getElementById("kopfgrafik").getContext("2d");
+  if (grafikChart) grafikChart.destroy();
+  grafikChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: tageNamen,
+      datasets: [
+        { label: 'Soft', data: soft },
+        { label: 'Wasser', data: wasser },
+        { label: 'Bier', data: bier }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
 </script>
 </body>
+
 </html>
+
 
